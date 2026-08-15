@@ -19,24 +19,25 @@ L = [3, 5]          # pipe lengths (ft) [list]
 D = [0.167, 0.167]  # pipe diams (ft) [list]
 i = [0,1]           # pipe order index
 
+##########
+
 # intermediate calculations
 # Conv volumetric flow (gpm) to Velocity (ft/s)
 #V = 0.4085 · Q(gpm) / D**2
-V = 0.104992 * 
+V = Q1 * D**2 * 0.104992
 
-
-
+f = 0.02 # assumed for now
 
 # equations
 # Darcy-Weisbach (dP form)
 # ΔP = f · (L/D) · (ρ V² / 2) · (1/144)      [ΔP in psi]
-
-
-
-
-ΔP = f · (L/D) · (ρ V² / 2) · (1/144)      [ΔP in psi]
+dP = f * (L/D) * (rho * V**2 / 2) * (1/144)     # [ΔP in psi]
 
 
 # unit conversions
-# ft^3/min = gpm * (0.13368 gal/min / 1 ft^3/min)
-# ft/s = ft^3/min * (pi/4) * D^2
+# Volume Flow to Velocity
+# V = Q * A
+# Q[ft^3/min] = Q[gpm] * (0.13368 gpm / 1 cfm)
+# V[ft/s] = Q[ft^3/min] * (pi/4) * D^2[ft^2]
+# V[ft/s] = Q[gpm] * D^2[ft^2] * (0.13368 * pi/4)
+# V[ft/s] = Q[gpm] * D^2[ft^2] * (0.104992 gpm/cfm)
