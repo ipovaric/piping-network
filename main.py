@@ -39,7 +39,7 @@ def calcFlows(data):
     D       = inputs['D']
     idx     = inputs['idx']
 
-    A,V,Q = [],[],[]
+    A,V,Q,Q_gpm = [],[],[],[]
 
     # unit conversions
     in_ft = 1/12
@@ -52,12 +52,23 @@ def calcFlows(data):
     #   inlet velocity (ft/s)
     Vin = (Qin / Ain) * (gpm_cfm / min_sec)
     #   mass flow rate (lbm/min)
-    w = rho * Vin * Ain
+    w = rho * Vin * Ain * (min_sec)
 
     for i in idx:
+        Ai = ((np.pi/4) * D[i]**2) * (in_ft**2)
+        Qi = w / rho # (lbm/min) * (ft^3/lbm)
+        Qi_gpm = Qi / gpm_cfm 
+        Vi = (Qi / Ai) * (gpm_cfm / min_sec)
 
-        # Conv volumetric flow (gpm) to Velocity (ft/s)
-        V = Qin * D[i]**2 * 0.104992
+        A.append(Ai)
+        Q.append(Qi)
+        Q_gpm.append(Qi_gpm)
+        V.append(Vi)
+
+    print([f'{x:.3f}' for x in A])
+    print([f'{x:.3f}' for x in Q])
+    print([f'{x:.2f}' for x in Q_gpm])
+    print([f'{x:.3f}' for x in V])
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
