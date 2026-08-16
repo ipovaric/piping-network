@@ -14,10 +14,10 @@ Pin = 100           # pressure at inlet (psia)
 Qin = 120           # volumetric flow rate at inlet (gpm)
 rho = 62.4          # density of fluid (lbf/ft^3)
 # geometric
-N_pipe = 2          # number of pipe lengths (qty)
-L = [300, 500]      # pipe lengths (ft) [list]
-D = [0.167, 0.167]  # pipe diams (ft) [list]
-idx = [0,1]         # pipe order index
+# N_pipe = 2          # number of pipe lengths (qty)
+L = [300,500,200,1000] # pipe lengths (ft) [list]
+D = [0.167,0.167,0.25,0.25]  # pipe diams (ft) [list]
+idx = [0,1,2,3]         # pipe order index
 
 inputs = {'Pin':Pin,
           'Qin':Qin,
