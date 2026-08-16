@@ -13,11 +13,11 @@ import numpy as np
 Pin = 100           # pressure at inlet (psia)
 Qin = 120           # volumetric flow rate at inlet (gpm)
 rho = 62.4          # density of fluid (lbf/ft^3)
-# geometric
-# N_pipe = 2          # number of pipe lengths (qty)
+# N_pipe = 2         # number of pipe lengths (qty)
 L = [300,500,200,1000] # pipe lengths (ft) [list]
-D = [0.167,0.167,0.25,0.25]  # pipe diams (ft) [list]
-idx = [0,1,2,3]         # pipe order index
+# D = [0.167,0.167,0.25,0.25]  # pipe diams (ft) [list]
+D = [2,2,3,3]       # pipe diams (in) [list]
+idx = [0,1,2,3]     # pipe order index
 
 inputs = {'Pin':Pin,
           'Qin':Qin,
@@ -25,18 +25,43 @@ inputs = {'Pin':Pin,
           'L':L,
           'D':D,
           'idx':idx}
+data = {'inputs',inputs}
 
 ##########
 
-def calcMajor(inputs):
+def calcFlows(data):
+    """ Calculate Velocity and Volumetric flow rates
+    """
+    inputs  = data['inputs']
+    Qin     = inputs['Qin']
+    D       = inputs['D']
+    idx     = inputs['idx']
+
+    # inlet conditions
+    #   inlet area (ft^2)
+    Ain = (np.pi/4) * D[0]**2 / 144
+    #   inlet velocity (ft/s)
+    Vin = Qin * D[0]**2 * 0.104992
+    
+    # mass flow rate (lbm/min)
+    w = rho*V*A
+
+    for i in idx:
+
+        # Conv volumetric flow (gpm) to Velocity (ft/s)
+        V = Qin * D[i]**2 * 0.104992
+
+def calcMajor(data):
     """ Calculate Major (friction) Losses
     """
 
-    dP = []
-
+    
+    inputs  = data['inputs']
     Pin     = inputs['Pin']
     Qin     = inputs['Qin']
     rho     = inputs['rho']
+
+    dP = []
 
     # i = 1
     for i in range(len(inputs['idx'])):
@@ -45,9 +70,7 @@ def calcMajor(inputs):
         Li      = inputs['L'][i]
         idx     = inputs['idx'][i]
 
-        # intermediate calculations
-        # Conv volumetric flow (gpm) to Velocity (ft/s)
-        V = Qin * Di**2 * 0.104992
+        
 
         # friction factor calc
         f = 0.02 # assumed for now
@@ -65,8 +88,20 @@ def calcMajor(inputs):
     print(f'dP Total: {dPTot:.3f} psid')
     print(f'Pout: {Pout:0.2f} psia')
 
-calcMajor(inputs)
+def calcRe(data):
+    """ Calculate reynods number 
+    Re = V·D·ρ / μ = V·D / ν
+    """
 
+    inputs = data['inputs']
+    V = 
+
+    Re = V·D·ρ / μ = V·D / ν
+
+def main(data):
+    calcMajor(data)
+
+main(data)
 # if __name__ == "__main__":
 #     calcMain(inputs)
 
