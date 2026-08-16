@@ -34,26 +34,36 @@ def calcMajor(inputs):
 
     dP = []
 
-    i = 1
     Pin     = inputs['Pin']
     Qin     = inputs['Qin']
     rho     = inputs['rho']
-    Di      = inputs['D'][i]
-    Li      = inputs['L'][i]
-    idx     = inputs['idx'][i]
 
-    # intermediate calculations
-    # Conv volumetric flow (gpm) to Velocity (ft/s)
-    V = Qin * Di**2 * 0.104992
+    # i = 1
+    for i in range(len(inputs['idx'])):
+        
+        Di      = inputs['D'][i]
+        Li      = inputs['L'][i]
+        idx     = inputs['idx'][i]
 
-    # friction factor calc
-    f = 0.02 # assumed for now
+        # intermediate calculations
+        # Conv volumetric flow (gpm) to Velocity (ft/s)
+        V = Qin * Di**2 * 0.104992
 
-    # equations
-    # Darcy-Weisbach (dP form)
-    dP[i] = f * (Li/Di) * (rho * V**2 / 2) * (1/144)     # [ΔP in psi]
+        # friction factor calc
+        f = 0.02 # assumed for now
 
-    print(dP)
+        # equations
+        # Darcy-Weisbach (dP form)
+        dPi = f * (Li/Di) * (rho * V**2 / 2) * (1/144)     # [ΔP in psi]
+        dP.append(dPi)
+
+    dPTot = np.sum(dP)
+    Pout = Pin - dPTot
+
+    print(inputs)
+    print([f'{x:.3f}' for x in dP])
+    print(f'dP Total: {dPTot:.3f} psid')
+    print(f'Pout: {Pout:0.2f} psia')
 
 calcMajor(inputs)
 
