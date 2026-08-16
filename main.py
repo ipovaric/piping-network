@@ -30,21 +30,29 @@ data = {'inputs',inputs}
 ##########
 
 def calcFlows(data):
-    """ Calculate Velocity and Volumetric flow rates
+    """ Calculate Velocity and Volumetric flow rates.
+    Assumptions:
+        * Single stream of flow (no branches)
     """
     inputs  = data['inputs']
     Qin     = inputs['Qin']
     D       = inputs['D']
     idx     = inputs['idx']
 
-    # inlet conditions
+    A,V,Q = [],[],[]
+
+    # unit conversions
+    in_ft = 1/12
+    min_sec = 60
+    gpm_cfm = 0.13368
+
+    # inlet conditions to get starting mfr
     #   inlet area (ft^2)
-    Ain = (np.pi/4) * D[0]**2 / 144
+    Ain = ((np.pi/4) * D[0]**2) * (in_ft**2)
     #   inlet velocity (ft/s)
-    Vin = Qin * D[0]**2 * 0.104992
-    
-    # mass flow rate (lbm/min)
-    w = rho*V*A
+    Vin = (Qin / Ain) * (gpm_cfm / min_sec)
+    #   mass flow rate (lbm/min)
+    w = rho * Vin * Ain
 
     for i in idx:
 
@@ -107,7 +115,7 @@ main(data)
 
 # unit conversions
 # Volume Flow to Velocity
-# V = Q * A
+# V = Q / A
 # Q[ft^3/min] = Q[gpm] * (0.13368 gpm / 1 cfm)
 # V[ft/s] = Q[ft^3/min] * (pi/4) * D^2[ft^2]
 # V[ft/s] = Q[gpm] * D^2[ft^2] * (0.13368 * pi/4)
