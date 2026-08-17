@@ -8,24 +8,15 @@
 #
 import numpy as np
 
-# example inputs (manual)
-# process
-Pin = 100           # pressure at inlet (psia)
-Qin = 120           # volumetric flow rate at inlet (gpm)
-rho = 62.4          # density of fluid (lbf/ft^3)
-mu  = 1.8e-5        # visc of fluid (lbf*s/ft^2)
-# N_pipe = 2         # number of pipe lengths (qty)
-L = [300,500,200,1000] # pipe lengths (ft) [list]
-# D = [0.167,0.167,0.25,0.25]  # pipe diams (ft) [list]
-D = [2,2,3,3]       # pipe diams (in) [list]
-idx = [0,1,2,3]     # pipe order index
-
-inputs = {'Pin':Pin,
-          'Qin':Qin,
-          'rho':rho,
-          'L':L,
-          'D':D,
-          'idx':idx}
+# test inputs (manual)
+inputs = {
+    'Pin':100,              # pressure at inlet (psia)
+    'Qin':120,              # volumetric flow rate at inlet (gpm)
+    'rho':62.4,             # density of fluid (lbf/ft^3)
+    'mu':1.8e-5,            # visc of fluid (lbf*s/ft^2)
+    'L':[300,500,200,1000], # pipe lengths (ft) [list]
+    'D':[2,2,3,3],          # pipe diams (in) [list]
+    'idx':[0,1,2,3]}        # pipe order index
 data = {'inputs':inputs}
 
 ##########
@@ -37,6 +28,8 @@ def calcFlows(data):
     """
     inputs  = data['inputs']
     Qin     = np.array(inputs['Qin'])
+    rho     = np.array(inputs['rho'])
+    mu      = np.array(inputs['mu'])
     D       = np.array(inputs['D'])
     idx     = inputs['idx']
 
@@ -46,6 +39,7 @@ def calcFlows(data):
     in_ft = 1/12
     min_sec = 60
     gpm_cfm = 0.13368
+    gc = 32.174 # lbm*ft/(lbf*s^2)
 
     # inlet conditions to get starting mfr
     #   inlet area (ft^2)
@@ -67,15 +61,20 @@ def calcFlows(data):
         Q_gpm.append(Qi_gpm)
         V.append(Vi)
 
+    # calc Reynolds number
+    Re = V * D * rho / (mu*gc)
+
     # print to console
-    val1 = ", ".join(f"{v:6.3f}" for v in A)
+    val1 = ", ".join(f"{v:8.3f}" for v in A)
     print(f"A:  {val1} ft^2")
-    val2 = ", ".join(f"{v:6.3f}" for v in Q)
+    val2 = ", ".join(f"{v:8.3f}" for v in Q)
     print(f"Q:  {val2} ft^3/min")
-    val3 = ", ".join(f"{v:6.1f}" for v in Q_gpm)
+    val3 = ", ".join(f"{v:8.1f}" for v in Q_gpm)
     print(f"Q:  {val3} gal/min")
-    val4 = ", ".join(f"{v:6.3f}" for v in V)
+    val4 = ", ".join(f"{v:8.3f}" for v in V)
     print(f"V:  {val4} ft/sec")
+    val5 = ", ".join(f"{v:8.2e}" for v in Re)
+    print(f"Re:  {val5}")
 
     # pack into data
     flows = {'w':w,
@@ -85,6 +84,8 @@ def calcFlows(data):
              'V':V}
     data['flows'] = flows
     return data
+
+
 
 def calcRe(data):
     """ Calculate reynods number 
@@ -102,10 +103,13 @@ def calcRe(data):
     flows   = data['flows']
     D       = np.array(inputs['D'])
     rho     = np.array(inputs['rho'])
-    mu = 
+    mu      = np.array(inputs['mu'])
     V       = flows['V']
 
-    # Re = V·D·ρ / μ = V·D / ν
+    Re = V * D * rho / (mu*gc)
+
+    val1 = ", ".join(f"{v:6.3g}" for v in Re)
+    print(f"Re:  {val1}")
 
 
 def calcMajor(data):
@@ -151,7 +155,6 @@ def main(data):
     data: tracking dictionary
     """
     calcFlows(data)
-    calcRe(data)
     # calcMajor(data)
     
     # print('')
@@ -161,6 +164,7 @@ main(data)
 # if __name__ == "__main__":
 #     calcMain(inputs)
 
+################
 # unit conversions
 # Volume Flow to Velocity
 # V = Q / A
@@ -168,3 +172,10 @@ main(data)
 # V[ft/s] = Q[ft^3/min] * (pi/4) * D^2[ft^2]
 # V[ft/s] = Q[gpm] * D^2[ft^2] * (0.13368 * pi/4)
 # V[ft/s] = Q[gpm] * D^2[ft^2] * (0.104992 gpm/cfm)
+
+# Reynolds Number
+# gc = 32.174 lbm*ft/(lbf*s^2)
+# (ft/s) * ft * (lbm/ft^3) / (lbf*s/ft^2)
+# (ft/s) * ft * (lbm/ft^3) * (ft^2/(lbf*s)) / gc
+# (ft^2/s) * (lbm/ft^3) * (ft^2/(lbf*s)) * (1/32.174) lbf*s^2/(lbm*ft)
+# (1/32.174)
