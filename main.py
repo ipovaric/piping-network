@@ -25,7 +25,7 @@ inputs = {'Pin':Pin,
           'L':L,
           'D':D,
           'idx':idx}
-data = {'inputs',inputs}
+data = {'inputs':inputs}
 
 ##########
 
@@ -35,8 +35,8 @@ def calcFlows(data):
         * Single stream of flow (no branches)
     """
     inputs  = data['inputs']
-    Qin     = inputs['Qin']
-    D       = inputs['D']
+    Qin     = np.array(inputs['Qin'])
+    D       = np.array(inputs['D'])
     idx     = inputs['idx']
 
     A,V,Q,Q_gpm = [],[],[],[]
@@ -54,9 +54,10 @@ def calcFlows(data):
     #   mass flow rate (lbm/min)
     w = rho * Vin * Ain * (min_sec)
 
+    # calc each flow rate
     for i in idx:
         Ai = ((np.pi/4) * D[i]**2) * (in_ft**2)
-        Qi = w / rho # (lbm/min) * (ft^3/lbm)
+        Qi = w / rho # (lbm/min) * (ft^3/lbm) = ft^3/min
         Qi_gpm = Qi / gpm_cfm 
         Vi = (Qi / Ai) * (gpm_cfm / min_sec)
 
@@ -65,10 +66,23 @@ def calcFlows(data):
         Q_gpm.append(Qi_gpm)
         V.append(Vi)
 
-    print([f'{x:.3f}' for x in A])
-    print([f'{x:.3f}' for x in Q])
-    print([f'{x:.2f}' for x in Q_gpm])
-    print([f'{x:.3f}' for x in V])
+    # print to console
+    val1 = ", ".join(f"{v:6.3f}" for v in A)
+    print(f"A:  {val1} ft^2")
+    val2 = ", ".join(f"{v:6.3f}" for v in Q)
+    print(f"Q:  {val2} ft^3/min")
+    val3 = ", ".join(f"{v:6.1f}" for v in Q_gpm)
+    print(f"Q:  {val3} gal/min")
+    val4 = ", ".join(f"{v:6.3f}" for v in V)
+    print(f"V:  {val4} ft/sec")
+
+    # pack into data
+    flows = {'A':A,
+             'Q':Q,
+             'Q_gpm':Q_gpm,
+             'V':V}
+    data['flows'] = flows
+    return data
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
@@ -113,12 +127,20 @@ def calcRe(data):
     """
 
     inputs = data['inputs']
-    V = 
+    # V = 
 
-    Re = V·D·ρ / μ = V·D / ν
+    # Re = V·D·ρ / μ = V·D / ν
 
 def main(data):
-    calcMajor(data)
+    """ Main Function 
+    data: tracking dictionary
+    """
+    calcFlows(data)
+    calcRe(data)
+    # calcMajor(data)
+    
+    # print('')
+    # print(data)
 
 main(data)
 # if __name__ == "__main__":
