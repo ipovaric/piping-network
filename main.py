@@ -13,6 +13,7 @@ import numpy as np
 Pin = 100           # pressure at inlet (psia)
 Qin = 120           # volumetric flow rate at inlet (gpm)
 rho = 62.4          # density of fluid (lbf/ft^3)
+mu  = 1.8e-5        # visc of fluid (lbf*s/ft^2)
 # N_pipe = 2         # number of pipe lengths (qty)
 L = [300,500,200,1000] # pipe lengths (ft) [list]
 # D = [0.167,0.167,0.25,0.25]  # pipe diams (ft) [list]
@@ -77,12 +78,35 @@ def calcFlows(data):
     print(f"V:  {val4} ft/sec")
 
     # pack into data
-    flows = {'A':A,
+    flows = {'w':w,
+             'A':A,
              'Q':Q,
              'Q_gpm':Q_gpm,
              'V':V}
     data['flows'] = flows
     return data
+
+def calcRe(data):
+    """ Calculate reynods number 
+    Re = V·D·ρ / μ·gc
+    """
+    # unit conversions
+    # gc = 32.174 lbm*ft/(lbf*s^2)
+    # (ft/s) * ft * (lbm/ft^3) / (lbf*s/ft^2)
+    # (ft/s) * ft * (lbm/ft^3) * (ft^2/(lbf*s)) / gc
+    # (ft^2/s) * (lbm/ft^3) * (ft^2/(lbf*s)) * (1/32.174) lbf*s^2/(lbm*ft)
+    # (1/32.174)
+    gc = 32.174 # lbm*ft/(lbf*s^2)
+
+    inputs  = data['inputs']
+    flows   = data['flows']
+    D       = np.array(inputs['D'])
+    rho     = np.array(inputs['rho'])
+    mu = 
+    V       = flows['V']
+
+    # Re = V·D·ρ / μ = V·D / ν
+
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
@@ -121,15 +145,6 @@ def calcMajor(data):
     print(f'dP Total: {dPTot:.3f} psid')
     print(f'Pout: {Pout:0.2f} psia')
 
-def calcRe(data):
-    """ Calculate reynods number 
-    Re = V·D·ρ / μ = V·D / ν
-    """
-
-    inputs = data['inputs']
-    # V = 
-
-    # Re = V·D·ρ / μ = V·D / ν
 
 def main(data):
     """ Main Function 
