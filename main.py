@@ -85,32 +85,19 @@ def calcFlows(data):
     data['flows'] = flows
     return data
 
-
-
-def calcRe(data):
-    """ Calculate reynods number 
-    Re = V·D·ρ / μ·gc
+def calcFriction(data):
+    """ Calculate Darcy Friction factors
+        Uses Swamee-Jain explicit approximation of Colebrook
     """
-    # unit conversions
-    # gc = 32.174 lbm*ft/(lbf*s^2)
-    # (ft/s) * ft * (lbm/ft^3) / (lbf*s/ft^2)
-    # (ft/s) * ft * (lbm/ft^3) * (ft^2/(lbf*s)) / gc
-    # (ft^2/s) * (lbm/ft^3) * (ft^2/(lbf*s)) * (1/32.174) lbf*s^2/(lbm*ft)
-    # (1/32.174)
-    gc = 32.174 # lbm*ft/(lbf*s^2)
-
+    # f = 0.25 / { log10[ (ε/D)/3.7 + 5.74/Re^0.9 ] }²
     inputs  = data['inputs']
-    flows   = data['flows']
-    D       = np.array(inputs['D'])
+    Qin     = np.array(inputs['Qin'])
     rho     = np.array(inputs['rho'])
     mu      = np.array(inputs['mu'])
-    V       = flows['V']
+    D       = np.array(inputs['D'])
+    idx     = inputs['idx']
 
-    Re = V * D * rho / (mu*gc)
-
-    val1 = ", ".join(f"{v:6.3g}" for v in Re)
-    print(f"Re:  {val1}")
-
+    
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
@@ -155,6 +142,7 @@ def main(data):
     data: tracking dictionary
     """
     calcFlows(data)
+    calcFriction(data)
     # calcMajor(data)
     
     # print('')
