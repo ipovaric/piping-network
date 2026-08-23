@@ -7,10 +7,10 @@
 #   1. Assumes an incomressible fluid (e.g. water,oil)
 #
 import numpy as np
-import math
+# import math
 
 # surface roughness
-eps = 0.0018 # in (0.00015 ft for welded steel)
+eps = np.array(0.0018) # in (0.00015 ft for welded steel)
 
 # test inputs (manual)
 inputs = {
@@ -85,7 +85,8 @@ def calcFlows(data):
              'A':A,
              'Q':Q,
              'Q_gpm':Q_gpm,
-             'V':V}
+             'V':V,
+             'Re':Re}
     data['flows'] = flows
     return data
 
@@ -96,14 +97,18 @@ def calcFriction(data):
     # f = 0.25 / { log10[ (ε/D)/3.7 + 5.74/Re^0.9 ] }²
 
     inputs  = data['inputs']
+    flows   = data['flows']
     Qin     = np.array(inputs['Qin'])
     rho     = np.array(inputs['rho'])
     
     D       = np.array(inputs['D'])
-    Re      = np.array(flows['Re'])
+    Re      = flows['Re']
     idx     = inputs['idx']
 
-    f = 0.25 / (math.log10( (eps/D)/3.7 + 5.74/Re**0.9))**2
+    f = 0.25 / (np.log10( (eps/D)/3.7 + 5.74/Re**0.9))**2
+
+    val1 = ", ".join(f"{v:8.2e}" for v in f)
+    print(f"Re:  {val1}")
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
