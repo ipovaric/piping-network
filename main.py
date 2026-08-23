@@ -78,7 +78,7 @@ def calcFlows(data):
     val4 = ", ".join(f"{v:8.3f}" for v in V)
     print(f"V:  {val4} ft/sec")
     val5 = ", ".join(f"{v:8.2e}" for v in Re)
-    print(f"Re:  {val5}")
+    print(f"Re: {val5}")
 
     # pack into data
     flows = {'w':w,
@@ -108,53 +108,60 @@ def calcFriction(data):
     f = 0.25 / (np.log10( (eps/D)/3.7 + 5.74/Re**0.9))**2
 
     val1 = ", ".join(f"{v:8.2e}" for v in f)
-    print(f"Re:  {val1}")
+    print(f"f:  {val1}")
+
+    friction = {'f':f}
+    data['friction'] = friction
+    return data
 
 def calcMajor(data):
     """ Calculate Major (friction) Losses
     """
 
-    
     inputs  = data['inputs']
-    Pin     = inputs['Pin']
-    Qin     = inputs['Qin']
-    rho     = inputs['rho']
+    flows   = data['flows']
+    friction= data['friction']
+    Pin     = np.array(inputs['Pin'])
+    L       = np.array(inputs['L'])
+    D       = np.array(inputs['D'])
+    rho     = np.array(inputs['rho'])
+    idx     = inputs['idx']
+    V       = flows['V']
+    f       = friction['f']    
 
     dP = []
 
     # i = 1
-    for i in range(len(inputs['idx'])):
-        
-        Di      = inputs['D'][i]
-        Li      = inputs['L'][i]
-        idx     = inputs['idx'][i]
-
-        
+    for i in range(len(idx)):        
 
         # friction factor calc
-        f = 0.02 # assumed for now
+        # f = 0.02 # assumed for now
 
         # equations
-        # Darcy-Weisbach (dP form)
-        dPi = f * (Li/Di) * (rho * V**2 / 2) * (1/144)     # [ΔP in psi]
+        # Darcy-Weisbach (dP form in psi)
+        dPi = f[i] * (L[i]/D[i]) * (rho * V[i]**2 / 2) * (1/144)     
         dP.append(dPi)
 
     dPTot = np.sum(dP)
     Pout = Pin - dPTot
 
-    print(inputs)
-    print([f'{x:.3f}' for x in dP])
-    print(f'dP Total: {dPTot:.3f} psid')
-    print(f'Pout: {Pout:0.2f} psia')
+    
+    # print([f'{x:.3f}' for x in dP])
+    val1 = ", ".join(f"{v:8.3f}" for v in dP)
+    print(f"dP: {val1} psia")
+
+    print(f'dPTot:{dPTot:6.3f} psid')
+    print(f'Pout:  {Pout:6.2f} psia')
 
 
 def main(data):
     """ Main Function 
     data: tracking dictionary
     """
+    print(inputs)
     calcFlows(data)
     calcFriction(data)
-    # calcMajor(data)
+    calcMajor(data)
     
     # print('')
     # print(data)
