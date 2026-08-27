@@ -100,7 +100,6 @@ def calcFriction(data):
     flows   = data['flows']
     Qin     = np.array(inputs['Qin'])
     rho     = np.array(inputs['rho'])
-    
     D       = np.array(inputs['D'])
     Re      = flows['Re']
     idx     = inputs['idx']
@@ -132,10 +131,7 @@ def calcMajor(data):
     dP = []
 
     # i = 1
-    for i in range(len(idx)):        
-
-        # friction factor calc
-        # f = 0.02 # assumed for now
+    for i in range(len(idx)):
 
         # equations
         # Darcy-Weisbach (dP form in psi)
@@ -149,9 +145,13 @@ def calcMajor(data):
     # print([f'{x:.3f}' for x in dP])
     val1 = ", ".join(f"{v:8.3f}" for v in dP)
     print(f"dP: {val1} psia")
-
     print(f'dPTot:{dPTot:6.3f} psid')
     print(f'Pout:  {Pout:6.2f} psia')
+
+def calcMinor(data):
+    inputs  = data['inputs']
+    flows   = data['flows']
+    friction= data['friction']
 
 
 def main(data):
@@ -185,3 +185,11 @@ main(data)
 # (ft/s) * ft * (lbm/ft^3) * (ft^2/(lbf*s)) / gc
 # (ft^2/s) * (lbm/ft^3) * (ft^2/(lbf*s)) * (1/32.174) lbf*s^2/(lbm*ft)
 # (1/32.174)
+
+## pressure drop - major
+# gc = 32.174 lbm*ft/(lbf*s^2)
+# ΔP = f · (L/D) · (ρ V² / 2) · (1/144)
+# ΔP (lbf/in^2) 
+# = (lbm/ft^3)*(ft/s)^2 / gc / 144
+# = (lbm/ft^3)*(ft/s)^2 * (1/32.174 (lbf*s^2)/(lbm*ft))*(1/144 1/ft^2))
+# = 
