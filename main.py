@@ -126,7 +126,11 @@ def calcMajor(data):
     rho     = np.array(inputs['rho'])
     idx     = inputs['idx']
     V       = flows['V']
-    f       = friction['f']    
+    f       = friction['f'] 
+
+    # unit conversions
+    in_ft = 1/12
+    gc = 32.174 # lbm*ft/(lbf*s^2)   
 
     dP = []
 
@@ -135,7 +139,7 @@ def calcMajor(data):
 
         # equations
         # Darcy-Weisbach (dP form in psi)
-        dPi = f[i] * (L[i]/D[i]) * (rho * V[i]**2 / 2) * (1/144)     
+        dPi = f[i] * (L[i]/D[i]) * (rho * V[i]**2 / (2*gc)) * (1/144)     
         dP.append(dPi)
 
     dPTot = np.sum(dP)
@@ -192,4 +196,4 @@ main(data)
 # ΔP (lbf/in^2) 
 # = (lbm/ft^3)*(ft/s)^2 / gc / 144
 # = (lbm/ft^3)*(ft/s)^2 * (1/32.174 (lbf*s^2)/(lbm*ft))*(1/144 1/ft^2))
-# = 
+# = ((1/32.174 (lbf))*(1/144 1/in^2)) - multipliers
